@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="css/admin.css">
+<script src="js/admin.js"></script>
+
 <body>
  <h3>Quotes from DB:</h3>
  <div id="root"></div>
@@ -12,13 +14,15 @@
 <br>
 
 <div>
-    <button class="btn btn-info btn-sm active text-light" onclick="createQuote(true)">Add New Quote</button>
-    <button class="btn btn-success btn-sm active text-light" onclick="">Save All</button>
+    <button class="btn btn-info btn-sm active text-light" onclick="createQuote(null, null, true)">Add New Quote</button>
+    <button class="btn btn-success btn-sm active text-light" onclick="addQuote()">Save and replace DB</button>
+    <button class="btn btn-success btn-sm active text-light" onclick="createQuote('this is my quote','alex', true)">test creation</button>
 </div>
 <br>
+<div id="response"></div>
 <div>
   <a class="btn btn-primary btn-sm active text-light link" href="/">Back</a>
 </div>
-<script src="js/admin.js"></script>
+
 </body>
 </html>

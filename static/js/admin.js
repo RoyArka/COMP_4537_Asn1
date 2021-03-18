@@ -1,32 +1,46 @@
 
-const root = document.getElementById("root");
+let quoteCounter = 0;
+
+//POST
+const POST = 'POST';
+
+//POST request endpoint
+const postEndpoint = "addQuote";
+
+//PUT request endpoint
+const putEndpoint = "updateQuote"
 
 //Creates quote prompt
-createQuote = (isAdmin) => {
+createQuote = (myQuote, myAuthor, isAdmin) => {
+    let root = document.getElementById("root");
 
     //check if admin
     if(!isAdmin) {
         textarea.setAttribute("readonly", "true");
     }
 
+    //div creation for quote block
+    let div = document.createElement("div");
+
     //Quote title
     let quoteTag = document.createElement("p");
-    quoteTag.innerHTML = '<h4>Quote:</h4>'
+    quoteTag.innerHTML = '<h4>Quote:</h4>';
 
     //Author title 
     let authorTag = document.createElement("p");
-    authorTag.innerHTML = '<h4>Author:</h4>'
-
-    //div creation for quote block
-    let div = document.createElement("div");
+    authorTag.innerHTML = '<h4>Author:</h4>';
 
     //quote within div
     let quoteInput = document.createElement("textarea");
     quoteInput.setAttribute('type', 'text');
+    quoteInput.setAttribute("id", "quoteInput" + quoteCounter);
+    quoteInput.value = myQuote;
 
     //author div
     let authorInput = document.createElement("input");
     authorInput.setAttribute('type', 'text');
+    authorInput.setAttribute("id", "authorInput" + quoteCounter);
+    authorInput.value = myAuthor;
 
     //delete quote button
     let deleteButton = document.createElement("button");
@@ -48,4 +62,34 @@ createQuote = (isAdmin) => {
     root.appendChild(deleteButton);
     root.appendChild(updateQuote);
     root.appendChild(document.createElement("br"));
+    quoteCounter++;
+    console.log("Number of Quotes: " + quoteCounter);
 }
+
+//Post AJAX Request 
+addQuote = () => {
+    const xhttp = new XMLHttpRequest();
+    for(i = 0; i < quoteCounter; i++){
+        let quoteInput = document.getElementById("quoteInput" + i).value
+        let authorInput = document.getElementById("authorInput" + i).value
+        let data = JSON.stringify({quote: quoteInput, author: authorInput});
+        console.log(data);
+
+        xhttp.open(POST, postEndpoint, true);
+        xhttp.setRequestHeader('Content-type', 'application/json');
+        xhttp.send(data);
+        
+        xhttp.onreadystatechange = function () {
+            if(this.readyState == 4 && this.status == 200) {
+                document.getElementById("response").innerHTML = this.responseText;
+            }
+        }
+    }
+}
+
+//GET AJAX Request
+
+//PUT AJAX Request
+
+//DELETE AJAX Request
+
