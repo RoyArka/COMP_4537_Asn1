@@ -20,7 +20,6 @@ app.get('/student', (req, res) => {
     res.sendFile(__dirname + '/views/student.html')
 });
 
-
 app.listen(port, () => {
     console.log('Server is listening on ' + port);
 });
