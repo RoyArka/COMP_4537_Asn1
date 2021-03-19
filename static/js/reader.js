@@ -1,14 +1,12 @@
 
 //GET
 const GET = 'GET';
-
-//GET readquote endpoint
-const getEndPoint = 'readQuote';
+const xhttp = new XMLHttpRequest();
+const endPointRoot = "/assignment1/express";
 
 //Reader GET Request 
 readfromDB = () => {
-    const xhttp = new XMLHttpRequest();
-    xhttp.open(GET, getEndPoint);
+    xhttp.open(GET, endPointRoot + "?isAdmin=false");
     xhttp.send();
     xhttp.onreadystatechange = function() {
         if(this.readyState == 4 && this.status == 200) {
@@ -17,3 +15,4 @@ readfromDB = () => {
         }
     } 
 }
+

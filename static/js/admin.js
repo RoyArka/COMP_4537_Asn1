@@ -1,14 +1,9 @@
 
 let quoteCounter = 0;
-
-//POST
+const xhttp = new XMLHttpRequest();
+const endPointRoot = "/assignment1/express";
 const POST = 'POST';
-
-//POST request endpoint
-const postEndpoint = "addQuote";
-
-//PUT request endpoint
-const putEndpoint = "updateQuote"
+const GET = 'GET';
 
 //Creates quote prompt
 createQuote = (myQuote, myAuthor, isAdmin) => {
@@ -66,16 +61,15 @@ createQuote = (myQuote, myAuthor, isAdmin) => {
     console.log("Number of Quotes: " + quoteCounter);
 }
 
-//Post AJAX Request 
+//admin Post Request 
 addQuote = () => {
-    const xhttp = new XMLHttpRequest();
     for(i = 0; i < quoteCounter; i++){
         let quoteInput = document.getElementById("quoteInput" + i).value
         let authorInput = document.getElementById("authorInput" + i).value
         let data = JSON.stringify({quote: quoteInput, author: authorInput});
         console.log(data);
 
-        xhttp.open(POST, postEndpoint, true);
+        xhttp.open(POST, endPointRoot, true);
         xhttp.setRequestHeader('Content-type', 'application/json');
         xhttp.send(data);
         
@@ -87,8 +81,17 @@ addQuote = () => {
     }
 }
 
-//GET AJAX Request
-
+//admin GET Request
+adminfromDB = () => {
+    xhttp.open(GET, endPointRoot + "?isAdmin=true");
+    xhttp.send();
+    xhttp.onreadystatechange = function() {
+        if(this.readyState == 4 && this.status == 200) {
+            console.log(this);
+            document.getElementById("root").innerHTML = this.responseText;
+        }
+    } 
+}
 //PUT AJAX Request
 
 //DELETE AJAX Request
