@@ -1,7 +1,7 @@
 
 let quoteCounter = 0;
 const xhttp = new XMLHttpRequest();
-const endPointRoot = "/assignment1/express";
+const endPointRoot = "/assignment1/v1/quotes";
 const POST = 'POST';
 const GET = 'GET';
 const DELETE = 'DELETE';
@@ -83,10 +83,10 @@ addQuote = () => {
         xhttp.onreadystatechange = function () {
             if(this.readyState == 4 && this.status == 200) {
                 console.log(this.responseText);
-                alert("Saved all Quotes in Database");
             }
         }
     }
+    alert("Saved all Quotes in Database");
 }
 
 //admin GET Request
@@ -100,9 +100,14 @@ adminfromDB = () => {
             console.log(data);
             qArray = data;
             loadQuotes();
+            //when no quotes are in the DB
+            if(quoteCounter === 0){
+                alert("No quotes in Database")
+            }
         }
     } 
 }
+
 
 //Load Quotes function
 loadQuotes = () => {
@@ -115,6 +120,7 @@ loadQuotes = () => {
 deleteQuote = (id, quoteCounter) => {
     document.getElementById("div"+quoteCounter).remove();
     adminDeletinDb(id);
+    alert("Quote Deleted in Database");
 }
 
 //admin DELETE Request
@@ -126,7 +132,6 @@ adminDeletinDb = (id) => {
     xhttp.onreadystatechange = function() {
         if(this.readyState == 4 && this.status == 200){
             console.log(this.responseText);
-            alert("Quote Deleted in Database");
         }
     }
 }
@@ -146,7 +151,7 @@ adminUpdateinDB = (id, quoteCounter) => {
     xhttp.onreadystatechange = function() {
         if(this.readyState == 4 && this.status == 200){
             console.log(this.responseText);
-            alert("Quote Updated in Databse");
         }
     }
+    alert("Quote Updated in Databse");
 }
