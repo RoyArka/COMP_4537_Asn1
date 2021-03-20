@@ -4,9 +4,12 @@ const xhttp = new XMLHttpRequest();
 const endPointRoot = "/assignment1/express";
 const POST = 'POST';
 const GET = 'GET';
+const DELETE = 'DELETE';
+const PUT = 'PUT';
+let qArray = [];
 
 //Creates quote prompt
-createQuote = (myQuote, myAuthor, isAdmin) => {
+createQuote = (myID, myQuote, myAuthor, isAdmin) => {
     let root = document.getElementById("root");
 
     //check if admin
@@ -16,6 +19,7 @@ createQuote = (myQuote, myAuthor, isAdmin) => {
 
     //div creation for quote block
     let div = document.createElement("div");
+    div.setAttribute("id", "div"+quoteCounter);
 
     //Quote title
     let quoteTag = document.createElement("p");
@@ -28,13 +32,13 @@ createQuote = (myQuote, myAuthor, isAdmin) => {
     //quote within div
     let quoteInput = document.createElement("textarea");
     quoteInput.setAttribute('type', 'text');
-    quoteInput.setAttribute("id", "quoteInput" + quoteCounter);
+    quoteInput.setAttribute("id", "quoteInput"+quoteCounter);
     quoteInput.value = myQuote;
 
     //author div
     let authorInput = document.createElement("input");
     authorInput.setAttribute('type', 'text');
-    authorInput.setAttribute("id", "authorInput" + quoteCounter);
+    authorInput.setAttribute("id", "authorInput"+quoteCounter);
     authorInput.value = myAuthor;
 
     //delete quote button
@@ -47,35 +51,38 @@ createQuote = (myQuote, myAuthor, isAdmin) => {
     updateQuote.setAttribute("id", "btnstyle");
 
     root.appendChild(div);
-    root.appendChild(quoteTag)
-    root.appendChild(quoteInput);
-    root.appendChild(document.createElement("br"));
-    root.appendChild(authorTag);
-    root.appendChild(authorInput);
-    root.appendChild(document.createElement("br"));
-    root.appendChild(document.createElement("br"));
-    root.appendChild(deleteButton);
-    root.appendChild(updateQuote);
-    root.appendChild(document.createElement("br"));
+    div.appendChild(quoteTag)
+    div.appendChild(quoteInput);
+    div.appendChild(document.createElement("br"));
+    div.appendChild(authorTag);
+    div.appendChild(authorInput);
+    div.appendChild(document.createElement("br"));
+    div.appendChild(document.createElement("br"));
+    div.appendChild(deleteButton);
+    deleteButton.setAttribute('onclick', 'deleteQuote('+myID+','+quoteCounter+')');
+    div.appendChild(updateQuote);
+    updateQuote.setAttribute('onclick', 'adminUpdateinDB('+myID+','+quoteCounter+')')
+    div.appendChild(document.createElement("br"));
     quoteCounter++;
-    console.log("Number of Quotes: " + quoteCounter);
 }
 
 //admin Post Request 
 addQuote = () => {
     for(i = 0; i < quoteCounter; i++){
-        let quoteInput = document.getElementById("quoteInput" + i).value
-        let authorInput = document.getElementById("authorInput" + i).value
-        let data = JSON.stringify({quote: quoteInput, author: authorInput});
+        let quoteValue = document.getElementById("quoteInput" + i).value
+        let authorValue = document.getElementById("authorInput" + i).value
+        console.log(quoteValue);
+        console.log(authorValue);
+        let data = JSON.stringify({quote: quoteValue, author: authorValue});
         console.log(data);
 
-        xhttp.open(POST, endPointRoot, true);
+        xhttp.open(POST, endPointRoot);
         xhttp.setRequestHeader('Content-type', 'application/json');
         xhttp.send(data);
         
         xhttp.onreadystatechange = function () {
             if(this.readyState == 4 && this.status == 200) {
-                document.getElementById("response").innerHTML = this.responseText;
+                console.log(this.responseText);
             }
         }
     }
@@ -87,12 +94,51 @@ adminfromDB = () => {
     xhttp.send();
     xhttp.onreadystatechange = function() {
         if(this.readyState == 4 && this.status == 200) {
-            console.log(this);
-            document.getElementById("root").innerHTML = this.responseText;
+            console.log(this.response);
+            let data = JSON.parse(this.response);
+            console.log(data);
+            qArray = data;
+            loadQuotes();
         }
     } 
 }
-//PUT AJAX Request
 
-//DELETE AJAX Request
+//Load Quotes function
+loadQuotes = () => {
+    qArray.forEach(element => {
+        createQuote(element.id, element.quote, element.author, true);
+    });
+}
 
+//Delete Quote function
+deleteQuote = (id, quoteCounter) => {
+    document.getElementById("div"+quoteCounter).remove();
+    adminDeletinDb(id);
+}
+
+//admin DELETE Request
+adminDeletinDb = (id) => {
+    console.log(id);
+    xhttp.open(DELETE, endPointRoot);
+    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhttp.send("id="+id); 
+    xhttp.onreadystatechange = function() {
+        if(this.readyState == 4 && this.status == 200){
+            console.log(this.responseText);
+        }
+    }
+}
+
+//admin PUT Request
+adminUpdateinDB = (id, quoteCounter) => {
+    console.log(id);
+    let quoteValue = document.getElementById("quoteInput" + quoteCounter).value
+    let authorValue = document.getElementById("authorInput" + quoteCounter).value
+    console.log(quoteValue);
+    console.log(authorValue);
+    let data = JSON.stringify({id: id, quote: quoteValue, author: authorValue});
+    console.log(data);
+    xhttp.open(PUT, endPointRoot);
+    xhttp.setRequestHeader('Content-type', 'application/json');
+    xhttp.send(data);
+}

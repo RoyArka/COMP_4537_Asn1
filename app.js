@@ -3,6 +3,7 @@ const mysql = require('mysql');
 const app = express();
 
 const endPointRoot = "/assignment1/express"
+const getCount = "quotes/count"
 
 //is admin bool
 var isAdmin = true;
@@ -48,19 +49,24 @@ const db = mysql.createPool({
     database: remoteDB.database
 })
 
-//Handles POST request
+//Handles POST request from admin
 app.post(endPointRoot, (req, res) => {
     console.log("recived a POST request");
     console.log(req.body);
     console.log(req.body.quote);
     console.log(req.body.author);
+
+    // //Checks existing rows if so then wipe
+    // if(countRows() > 0){
+    //     deleteAllRows();
+    // }
     insertIntoTable(req.body.quote, req.body.author, res);
 });
 
 //Handles GET request from reader
 app.get(endPointRoot, (req, res) => {
-    
     if(req.query.isAdmin === "true"){
+        isAdmin = true;
         console.log('recieved a GET request from admin')
         readFromTable(res);
     }
@@ -69,11 +75,39 @@ app.get(endPointRoot, (req, res) => {
         console.log('recieved a GET request from reader')
         readFromTable(res);
     }
-})
+});
+
+//Handles PUT request from admin
+app.put(endPointRoot, (req, res) => {
+    console.log("recieved a PUT request from admin")
+    console.log(req.body);
+    console.log(req.body.id);
+    console.log(req.body.quote);
+    console.log(req.body.author);
+});
+
+//Handles DELETE request from admin
+app.delete(endPointRoot, (req, res) => {
+    console.log("recieved a DELETE request from admin");
+    console.log(req.body);
+    
+    //Row to delete in DB
+    let id = req.body.id;
+    deleteRow(id);
+});
 
 //Inserts into table 
 insertIntoTable = (quote, author, res) => {
     let query = `INSERT INTO quote_author(quote, author) values ('${quote}', '${author}')`;
+    db.query(query, (err, res) => {
+        if(err) throw err;
+        console.log(res);
+    });
+}
+
+//Delete row in table
+deleteRow = (id) => {
+    let query = 'DELETE FROM quote_author WHERE id = ' + id;
     db.query(query, (err, res) => {
         if(err) throw err;
         console.log(res);
@@ -92,7 +126,7 @@ readFromTable = (res) => {
             res.end(formatReaderResult(result));
         }
         else{
-           res.end(formatAdminResult(result));
+           res.json(result);
         }
     });
 }
@@ -103,21 +137,9 @@ const formatReaderResult = (result) => {
     formattedResult += "<tr> <th>Quotes</th> <th>Authors</th> </tr>";
     result.forEach(row => {
         formattedResult +="<tr>"
-        formattedResult += `<td>'${row.quote}'</td>`;
-        formattedResult += `<td>'${row.author}'</td>`;
+        formattedResult += `<td>${row.quote}</td>`;
+        formattedResult += `<td>${row.author}</td>`;
         formattedResult +="</tr>"
-    })
-    formattedResult += "</table>";
-    return formattedResult;
-}
-
-//Formats results for admin page
-const formatAdminResult = (result) => {
-    formattedResult = "<table>"
-    formattedResult += "<tr> <th>Quotes</th> <th>Authors</th> </tr>";
-    result.forEach(row => {
-        formattedResult += `<td>'${row.quote}'</td>`;
-        formattedResult += `<td>'${row.author}'</td>`;
     })
     formattedResult += "</table>";
     return formattedResult;
