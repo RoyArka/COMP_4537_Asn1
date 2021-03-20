@@ -166,8 +166,8 @@ deleteAllRows = () => {
 
 //Selects the last row in table for most recent quote
 lastRow = (res) => {
-    let query = `SELECT id FROM quotes ORDER BY id DESC LIMIT 1`
-    db.query(query, (err, res) => {
+    let query = `SELECT * FROM quote_author ORDER BY id DESC LIMIT 1`
+    db.query(query, (err, result) => {
         if(err){
             throw err;
         }

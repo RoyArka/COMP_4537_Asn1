@@ -20,15 +20,15 @@ readFromDB = () => {
 }
 
 //Reader GET Request for recent quote
-// recentFromDB = () => {
-//     xhttp.open(GET, endPointQuote + "?isAdmin=false");
-//     xhttp.send();
-//     xhttp.onreadystatechange = function() {
-//         if(this.readyState == 4 && this.status == 200) {
-//             console.log(this);
-//             document.getElementById("results").innerHTML = this.responseText;
-//         }
-//     } 
-// }
+recentFromDB = () => {
+    xhttp.open(GET, endPointQuote + "?isAdmin=false");
+    xhttp.send();
+    xhttp.onreadystatechange = function() {
+        if(this.readyState == 4 && this.status == 200) {
+            console.log(this);
+            document.getElementById("results").innerHTML = this.responseText;
+        }
+    } 
+}
 
 
