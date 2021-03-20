@@ -76,13 +76,14 @@ addQuote = () => {
         let data = JSON.stringify({quote: quoteValue, author: authorValue});
         console.log(data);
 
-        xhttp.open(POST, endPointRoot);
+        xhttp.open(POST, endPointRoot, true);
         xhttp.setRequestHeader('Content-type', 'application/json');
         xhttp.send(data);
         
         xhttp.onreadystatechange = function () {
             if(this.readyState == 4 && this.status == 200) {
                 console.log(this.responseText);
+                alert("Saved all Quotes in Database");
             }
         }
     }
@@ -90,7 +91,7 @@ addQuote = () => {
 
 //admin GET Request
 adminfromDB = () => {
-    xhttp.open(GET, endPointRoot + "?isAdmin=true");
+    xhttp.open(GET, endPointRoot + "?isAdmin=true", true);
     xhttp.send();
     xhttp.onreadystatechange = function() {
         if(this.readyState == 4 && this.status == 200) {
@@ -119,12 +120,13 @@ deleteQuote = (id, quoteCounter) => {
 //admin DELETE Request
 adminDeletinDb = (id) => {
     console.log(id);
-    xhttp.open(DELETE, endPointRoot);
+    xhttp.open(DELETE, endPointRoot, true);
     xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     xhttp.send("id="+id); 
     xhttp.onreadystatechange = function() {
         if(this.readyState == 4 && this.status == 200){
             console.log(this.responseText);
+            alert("Quote Deleted in Database");
         }
     }
 }
@@ -138,7 +140,13 @@ adminUpdateinDB = (id, quoteCounter) => {
     console.log(authorValue);
     let data = JSON.stringify({id: id, quote: quoteValue, author: authorValue});
     console.log(data);
-    xhttp.open(PUT, endPointRoot);
+    xhttp.open(PUT, endPointRoot, true);
     xhttp.setRequestHeader('Content-type', 'application/json');
     xhttp.send(data);
+    xhttp.onreadystatechange = function() {
+        if(this.readyState == 4 && this.status == 200){
+            console.log(this.responseText);
+            alert("Quote Updated in Databse");
+        }
+    }
 }

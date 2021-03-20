@@ -2,8 +2,10 @@ const express = require('express');
 const mysql = require('mysql');
 const app = express();
 
-const endPointRoot = "/assignment1/express"
-const getCount = "quotes/count"
+//endpoint for all quotes
+const endPointRoot = "/assignment1/v1/quotes";
+//endpoint for most recent quote
+const endPointQuote = "/assignment1/v1/quotes/1";
 
 //is admin bool
 var isAdmin = true;
@@ -40,6 +42,14 @@ app.get('/reader', (req, res) => {
     res.sendFile(__dirname + '/views/reader.html')
 });
 
+app.get('/allquotes', (req, res) => {
+    res.sendFile(__dirname + '/views/allreader.html');
+});
+
+app.get('/recentquote', (req, res) => {
+    res.sendFile(__dirname + '/views/recentreader.html');
+});
+
 //Create Connection to DB
 const db = mysql.createPool({
     connectionLimit : 10,
@@ -56,14 +66,12 @@ app.post(endPointRoot, (req, res) => {
     console.log(req.body.quote);
     console.log(req.body.author);
 
-    // //Checks existing rows if so then wipe
-    // if(countRows() > 0){
-    //     deleteAllRows();
-    // }
+    //Checks existing rows if so then wipe
+    deleteAllRows();
     insertIntoTable(req.body.quote, req.body.author, res);
 });
 
-//Handles GET request from reader
+//Handles GET requests from admin, and all quotes
 app.get(endPointRoot, (req, res) => {
     if(req.query.isAdmin === "true"){
         isAdmin = true;
@@ -77,21 +85,28 @@ app.get(endPointRoot, (req, res) => {
     }
 });
 
+//Handles GET request for most recent quote reader side
+app.get(endPointQuote, (req, res) => {
+    isAdmin = false;
+    console.log('recieved a GET request for recent quote')
+    lastRow(res);
+});
+
 //Handles PUT request from admin
 app.put(endPointRoot, (req, res) => {
     console.log("recieved a PUT request from admin")
     console.log(req.body);
-    console.log(req.body.id);
-    console.log(req.body.quote);
-    console.log(req.body.author);
+    let ID = req.body.id;
+    let newQuote = req.body.quote
+    let newAuthor = req.body.author;
+    updateRow(ID, newQuote, newAuthor);
 });
 
 //Handles DELETE request from admin
 app.delete(endPointRoot, (req, res) => {
     console.log("recieved a DELETE request from admin");
     console.log(req.body);
-    
-    //Row to delete in DB
+    //Row to delete in DB based via ID
     let id = req.body.id;
     deleteRow(id);
 });
@@ -105,9 +120,18 @@ insertIntoTable = (quote, author, res) => {
     });
 }
 
+//Updates row in table
+updateRow = (id, quote, author) => {
+    let query = 'UPDATE quote_author SET quote = "' + quote + '", author = "' + author + '" WHERE id = ' + id;
+    db.query(query, (err, res) => {
+        if(err) throw err;
+        console.log(res);
+    });
+}
+
 //Delete row in table
 deleteRow = (id) => {
-    let query = 'DELETE FROM quote_author WHERE id = ' + id;
+    let query = `DELETE FROM quote_author WHERE id = ` + id;
     db.query(query, (err, res) => {
         if(err) throw err;
         console.log(res);
@@ -131,10 +155,32 @@ readFromTable = (res) => {
     });
 }
 
+//Deletes all Rows in table
+deleteAllRows = () => {
+    let query = `DELETE FROM quote_author WHERE COUNT(ID)> 0`;
+    db.query(query, (err, res) => {
+        if(err) throw err;
+        console.log(res);
+    });
+}
+
+//Selects the last row in table for most recent quote
+lastRow = (res) => {
+    let query = `SELECT id FROM quotes ORDER BY id DESC LIMIT 1`
+    db.query(query, (err, res) => {
+        if(err){
+            throw err;
+        }
+        else{
+            res.end(formatReaderResult(result));
+        } 
+    });
+}
+
 //Formats results for reader page
 const formatReaderResult = (result) => {
     formattedResult = "<table>"
-    formattedResult += "<tr> <th>Quotes</th> <th>Authors</th> </tr>";
+    formattedResult += "<tr><th>Quote</th> <th>Author</th></tr>";
     result.forEach(row => {
         formattedResult +="<tr>"
         formattedResult += `<td>${row.quote}</td>`;
