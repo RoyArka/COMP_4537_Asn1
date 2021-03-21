@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //PORT
-let port = 8888 || process.env.PORT;
+let port = process.env.PORT || 8888;
 
 //DB creds
 const remoteDB = {
