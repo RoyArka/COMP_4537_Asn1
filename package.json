@@ -1,7 +1,6 @@
 {
   "name": "isa_asn",
   "version": "1.0.0",
-  "description": "",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,5 +11,15 @@
     "express": "^4.17.1",
     "mysql": "^2.18.1",
     "sql": "^0.78.0"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RoyArka/COMP_4537_Asn1.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RoyArka/COMP_4537_Asn1/issues"
+  },
+  "homepage": "https://github.com/RoyArka/COMP_4537_Asn1#readme",
+  "description": ""
 }

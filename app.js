@@ -1,3 +1,5 @@
+//PORT
+const port = process.env.PORT || 3000;
 const express = require('express');
 const mysql = require('mysql');
 const app = express();
@@ -12,9 +14,6 @@ var isAdmin = true;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-//PORT
-let port = process.env.PORT || 3000;
 
 //DB creds
 const remoteDB = {
