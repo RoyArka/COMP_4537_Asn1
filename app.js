@@ -65,8 +65,8 @@ app.post(endPointRoot, (req, res) => {
     console.log("recived a POST request");
     let newQuote = req.body.quote
     let newAuthor = req.body.author;
-    deleteRows();
     insertIntoTable(newQuote, newAuthor, res);
+    lastRow(res, false);
 });
 
 //Handles GET requests from admin, and all quotes
@@ -87,25 +87,21 @@ app.get(endPointRoot, (req, res) => {
 app.get(endPointQuote, (req, res) => {
     isAdmin = false;
     console.log('recieved a GET request for recent quote')
-    lastRow(res);
+    lastRow(res, true);
 });
 
 //Handles PUT request from admin
 app.put(endPointRoot, (req, res) => {
     console.log("recieved a PUT request from admin")
-    console.log(req.body);
     let ID = req.body.id;
     let newQuote = req.body.quote
     let newAuthor = req.body.author;
-    deleteRow();
     updateRow(ID, newQuote, newAuthor);
 });
 
 //Handles DELETE request from admin
 app.delete(endPointRoot, (req, res) => {
     console.log("recieved a DELETE request from admin");
-    console.log(req.body);
-    //Row to delete in DB based via ID
     let id = req.body.id;
     deleteRow(id);
 });
@@ -122,7 +118,6 @@ insertIntoTable = (quote, author, res) => {
 //Updates row in table
 updateRow = (id, quote, author) => {
     let query = 'UPDATE quote_author SET quote = "' + quote + '", author = "' + author + '" WHERE id = ' + id;
-    //let query = `INSERT INTO quote_author(quote, author) values ('${quote}', '${author}') ON DUPLICATE KEY UPDATE name='${quote}', author='${author}'`;
     db.query(query, (err, res) => {
         if(err) throw err;
         console.log(res);
@@ -155,40 +150,15 @@ readFromTable = (res) => {
     });
 }
 
-//drops table
-deleteRows = () => {
-    let query = `DELETE FROM quote_author`;
-    db.query(query, (err, res) => {
-        if(err) throw err;
-        console.log(res);
-    });
-}
-
-// //drops table
-// dropTable = () => {
-//     let query = `DROP TABLE quote_author`;
-//     db.query(query, (err, res) => {
-//         if(err) throw err;
-//         console.log(res);
-//     });
-// }
-
-// //creates table
-// createTable = () => {
-//     let query = `CREATE TABLE quote_author(id INT NOT NULL AUTO_INCREMENT, quote VARCHAR(255), author VARCHAR(20), PRIMARY KEY (id));`;
-//     db.query(query, (err, res) => {
-//         if(err) throw err;
-//         console.log(res);
-//     });
-// }
-
-
 //Selects the last row in table for most recent quote
-lastRow = (res) => {
+lastRow = (res, isGet) => {
     let query = `SELECT * FROM quote_author ORDER BY id DESC LIMIT 1`
     db.query(query, (err, result) => {
         if(err){
             throw err;
+        }
+        if(!isGet){
+            res.json(result);
         }
         else{
             res.end(formatReaderResult(result));
